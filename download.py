@@ -8,31 +8,14 @@ from os import environ
 
 environ['PYTHONUNBUFFERED'] = '1'
 
-def create_file(size):
-    filename = '{0:04d}.meg'.format(size)
-    size *= 1024 * 1024
-    with open('/dev/urandom', 'rb') as rand:
-        with open(filename, 'wb') as fh:
-            while size:
-                buf = rand.read(size)
-                size -= len(buf)
-                fh.write(buf)
-    return filename
-
-def progress(up, tot):
-    print '    {0:0.2f}'.format(up / float(tot))
-
-
 conn = S3Connection(KEY, SECRET)
 bucket = conn.get_bucket(BUCKET)
 key = Key(bucket)
 for size in (1, 10, 100):
     key.key = '{0:04d}'.format(size)
-    filename = create_file(size)
-    print 'uploading {0} MB file'.format(size)
+    print 'download {0} MB file'.format(size)
     start = datetime.now()
-    key.set_contents_from_filename(filename, policy='public-read',
-                                   cb=progress)
+    key.get_contents_to_filename('/dev/null')
     duration = datetime.now() - start
     duration = (getattr(duration, 'minutes', 0) * 60) + \
         duration.seconds + (duration.microseconds / 1E6)
