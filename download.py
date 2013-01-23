@@ -5,11 +5,12 @@ from boto.s3.key import Key
 from creds import *
 from datetime import datetime
 from os import environ
+from sys import argv
 
 environ['PYTHONUNBUFFERED'] = '1'
 
 conn = S3Connection(KEY, SECRET)
-bucket = conn.get_bucket(BUCKET)
+bucket = conn.get_bucket(argv[1] if len(argv) > 1 else BUCKET)
 key = Key(bucket)
 for size in (1, 10, 100):
     key.key = '{0:04d}'.format(size)
